@@ -4,5 +4,5 @@ __pycache__
 */.DS_Store
 .DS_Store
 # Don't push model to repo except keeping the folder structure
-models/
+models/*.pkl
 !models/.gitkeep 
