@@ -42,7 +42,7 @@ def train_model(x_train, y_train):
 
     ml_pipeline = Pipeline([
         ('preprocessing', feature_transformer),
-        ('randomforest', RandomForestRegressor())
+        ('randomforest', RandomForestRegressor(n_estimators=30))
     ])
 
     model = ml_pipeline.fit(x_train, y_train)
