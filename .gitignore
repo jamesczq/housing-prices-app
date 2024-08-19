@@ -1,0 +1,8 @@
+__pycache__/
+.ipynb_checkpoints/
+__pycache__
+*/.DS_Store
+.DS_Store
+# Don't push model to repo except keeping the folder structure
+models/
+!models/.gitkeep 
