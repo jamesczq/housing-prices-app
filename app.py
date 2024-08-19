@@ -7,6 +7,7 @@ import json
 import joblib
 from pathlib import Path
 import pandas as pd
+import uvicorn
 
 from src.schema import HouseProperty
 
@@ -52,3 +53,6 @@ def predict(property: HouseProperty):
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=e,
         )
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
