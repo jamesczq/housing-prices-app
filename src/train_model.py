@@ -16,7 +16,16 @@ import re
 
 from schema import CAT_COLS, NUM_COLS
 import preprocessing
-import constants
+
+
+# Random state  
+RANDOM_STATE = 123
+
+# Test ratio of total data set
+TEST_SIZE = 0.2
+
+# Num of cross-validation folds
+CV = 5
 
 
 def define_feature_transformer():
@@ -57,7 +66,7 @@ def eval_model(model, x, y):
         x, 
         y, 
         scoring='neg_mean_absolute_error',
-        cv=constants.CV)
+        cv=CV)
     mae = -scores
     mu, sigma = mae.mean(), mae.std()
     str_out = f"Mean Absolute Error (MAE) estimated from cross-validation: "
@@ -78,8 +87,8 @@ def main():
     x_train, x_test, y_train, y_test = train_test_split(
         x, 
         y, 
-        test_size=constants.TEST_SIZE,
-        random_state=constants.RANDOM_STATE
+        test_size=TEST_SIZE,
+        random_state=RANDOM_STATE
     )
     
     model = train_model(x_train, y_train)
