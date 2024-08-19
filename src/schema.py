@@ -2,12 +2,29 @@ from enum import Enum
 from pydantic import BaseModel
 from typing import Optional
 
+# Define numeric feature columns, categorical feature columns, target columns
+NUM_COLS = [
+    'longitude', 
+    'latitude', 
+    'housing_median_age', 
+    'total_rooms', 
+    'total_bedrooms', 
+    'population', 
+    'households', 
+    'median_income']
+
+CAT_COLS = ['ocean_proximity']
+
+Y_COL = 'median_house_value'
+
+
 class OceanProximity(Enum):
     VALUE1 = "<1H OCEAN"
     VALUE2 = "INLAND"
     VALUE3 = "NEAR OCEAN"
     VALUE4 = "NEAR BAY"
     VALUE5 = "ISLAND"
+
 
 class HouseProperty(BaseModel):
     longitude: Optional[float] = None 

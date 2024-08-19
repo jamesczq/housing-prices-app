@@ -10,27 +10,28 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from pathlib import Path
 
 import joblib
-import numpy as np
+import json
 import pandas as pd
+import re 
+
+from schema import CAT_COLS, NUM_COLS
 import preprocessing
-
 import constants
-
 
 
 def define_feature_transformer():
     num_pipeline = Pipeline([
-        ("imputer", SimpleImputer(strategy="median")),
-        ("std_scaler", StandardScaler())
+        ("Imputer", SimpleImputer(strategy="median")),
+        ("Std_Scaler", StandardScaler())
     ])
     
     cat_pipeline = Pipeline([
-        ('onehot', OneHotEncoder(handle_unknown='ignore'))
+        ('One-hot', OneHotEncoder(handle_unknown='ignore'))
     ])
 
     feature_transformer = ColumnTransformer([
-        ('num', num_pipeline, constants.NUM_COLS),
-        ('cat', cat_pipeline, constants.CAT_COLS)
+        ('Numeric Feature Transform', num_pipeline, NUM_COLS),
+        ('Categorical Feature Transform', cat_pipeline, CAT_COLS)
     ])
     
     return feature_transformer
@@ -41,8 +42,8 @@ def train_model(x_train, y_train):
     feature_transformer = define_feature_transformer()
 
     ml_pipeline = Pipeline([
-        ('preprocessing', feature_transformer),
-        ('randomforest', RandomForestRegressor(n_estimators=30))
+        ('Preprocessing', feature_transformer),
+        ('Regression Model Random Forest', RandomForestRegressor(n_estimators=30))
     ])
 
     model = ml_pipeline.fit(x_train, y_train)
@@ -59,8 +60,10 @@ def eval_model(model, x, y):
         cv=constants.CV)
     mae = -scores
     mu, sigma = mae.mean(), mae.std()
-    str_out = f"Training Mean Absolute Error (MAE): {mu:.2f} +/- {sigma:.2f}"
+    str_out = f"Mean Absolute Error (MAE) estimated from cross-validation: "
+    str_out += f"{mu:.2f} +/- {sigma:.2f}"
     print(str_out)
+    return str_out
 
 
 def main():
@@ -81,14 +84,24 @@ def main():
     
     model = train_model(x_train, y_train)
 
-    eval_model(model, x, y)
+    str_cv_mae = eval_model(model, x, y)
 
     test_mae = mean_absolute_error(y_true=y_test, y_pred=model.predict(x_test))
     print(f"Test Mean Absolute Error (MAE): {test_mae:.2f}")
 
     model_path = Path.cwd()/"models"/"model.pkl"
     joblib.dump(model, model_path)
-    print(f"Model (Random Forest Regressor) -> {model_path}")
+    print(f"Model (Random Forest Regressor) saved to: {model_path}")
+
+    model_info_path = Path.cwd()/"models"/"model_info.json"
+    model_info = {
+        'performance': str_cv_mae,
+        'model-info': re.sub(' +', ' ', str(model)).strip()
+    }
+    with open(model_info_path, "w") as f:
+        json.dump(model_info, f)
+    print(f"Model info saved to: {model_info_path}")
+
 
 if __name__ == "__main__":
     main()
