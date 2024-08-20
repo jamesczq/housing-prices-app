@@ -75,7 +75,7 @@ You can interact with the API using the Swagger UI documentation. The UI documen
 ### Endpoint: /model-info
 
 ```
-  GET /
+  GET /model-info
 ```
 
 #### Response
