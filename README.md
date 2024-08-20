@@ -1,52 +1,60 @@
-# CA Housing Prices
+# Coding Exercise - California Housing Prices Prediction 
 
-This project is focused on creating a Machine Learning (ML) model to predict sale prices of real estate properties in CA. The project is divided into four stages: data collection, data analysis, machine learning model creation and API deployment. 
+This project shows the main process of designing, implementing, and deploying a machine learning model that predicts housing prices. Notice that the focus is more on software architecture and deployment parts than on the machine learning model development part.
 
+## Data Preprocessing
 
+After getting the dataset [California Housing Prices](https://www.kaggle.com/datasets/camnugent/california-housing-prices/data), we first did some data analysis, mainly, (1) identifying what the features are and what the target variables is, and (2) inspecting data to see if there were noticeable problems, e.g., missing-value problems, large presence of outliers. Fortunately, the data seems already clean. These were done through data visualization, correlation anlysis, etc. Details can be found in Section 1 of the notebook `notebooks/from-data-to-model.ipynb`.
 
-## Data Collection and Cleaning
+### Feature Engineering
 
-This stage involved collecting the real estate data using a web scraper. The collected data was then cleaned to improve the accuracy of the analysis. The data cleaning process included the following steps:
+For simplicity, and acting out of firm belief in "Principle of Least Action", we defined the feature engineering to take the following simple actions:
+* For categorical features, we did one-hot encoding.
+* For numerical features, we imputed missing values with median and scaled the values with the standard scaling (i.e., the transformed feature values are with $\mu = 0, \sigma = 1$).
 
-1. Removing parameters that were irrelevant, contained constant values, or had a small sample size.
-2. Removing rows that contained missing values on important parameters such as price or netHabitableSurface.
-3. Removing duplicate rows based on matching latitude, longitude, price, street, postalCode, and number.
-4. Imputing missing values for certain parameters.
-
-## Data Analysis
-
-The second stage focused on exploring the dataset through data visualization. Price correlations and price distributions across different regions of Belgium were analyzed after removing outliers. The visualizations and their interpretations can be found in the notebook ` from-data-to-model.ipynb`.
+The details can be found in `src/preprocessing.py`.
 
 ## Machine Learning Model Creation
 
-During the third stage of the project, two types of machine learning models were implemented to predict property prices: Linear Regression and XGBoost and each were tested their performances with different sets of features. After testing, we created a pipeline.
-The steps involved in this stage are as follows:
+### Which Regression Algorithm to Use?
+For simplicity, we went for classical machine learning models which training and inferencing can be done fast, compared with deep learning models. Further, we looked at two prototypical classical regression models: linear regression (with regularization, e.g., Lasso) and random forest regression which is non-linear.
 
-1. Data Splitting: The dataset is split into training and testing datasets for model evaluation. The data is also split based on the type of property (House or Apartment).
+We first did a few experiments: training regression Linear Regression models and Random Forest Regression models, and comparing their prediction performance. We observed from cross-validation estimates of mean absolute error (MAE) and test MAE that Random Forest Regressor seemed to outperform Linear Regressor. Thus, we focused on building a `Random Forest` regression model. The details of these experiments can be found in Section 4 of `notebooks/from-data-to-model.ipynb`.
 
-2. Feature Scaling: The numerical features in the dataset are scaled using Min-Max Scaler to ensure that all features have the same scale, which improves the performance of the models.
+### Model Training
+We encapsulated the model in a pipeline. The steps are as follows:
 
-3. Feature encoding: The categorical features in the dataset are encoded using a one-hot (aka ‘one-of-K’ or ‘dummy’) encoding scheme. This creates a binary column for each category and returns a sparse matrix. This encoding is needed for feeding categorical data to the model as the model used only accepts numerical values.
+1. Data Splitting: The dataset is split into training and testing datasets for model evaluation. 
 
-4. Model Training: A Linear Regression model and an XGBoost model was trained on the training data.
+2. Feature Engineering: 
+  * The numerical features are scaled using Standard Scaler to ensure that all features have comparable scale, which improves the performance of the models. 
+  * The categorical features are encoded using a one-hot (aka ‘one-of-K’) encoding scheme. This creates a binary column for each category. Thus all features are turned into numeric values.
 
-5. Model Evaluation: The performance of our models were evaluated on the testing data using Mean Absolute Error (MAE). The Random Forest Regression model was selected based on it's superior performances compared to the Linear Regression model.
+3. Model Training: A Random Forest Regression model was trained on the training data.
 
-## Installation and Usage
+4. Model Evaluation: The performance of the models were evaluated on the testing data using Mean Absolute Error (MAE).
 
-If you dont have Docker installed, you can download and install it from [here](https://www.docker.com/)
+The details of above can be found in `src/preprocessing.py` and `src/preprocessing.py`.
+
+## Model Serving
+
+We served the prediction/inference with REST API, which can accept input features in JSON format and return the predicted housing price. The details can be found in `app.py`.
+
+## Deployment
+
+The application was containerized using Docker. 
 
 To run the FastAPI server, follow these steps:
 
-1. Clone the [xyz](https://github.com/jamesczq/housing-prices-app) repository
+1. Clone the [housing-prices-app](https://github.com/jamesczq/housing-prices-app) repository
 2. Navigate to the root of the repository
 3. Build the Docker image: `docker build -t house-price-api-image .`
 4. Run the Docker container: `docker run --name api_container -p 8000:8000 house-price-api-image`
 5. The FastAPI server will be accessible at `http://localhost:8000`
 
-## API Reference
+## Testing/API Reference
 
-You can interact with the API using the Swagger UI documentation. The Swagger UI is automatically generated and can be accessed from the /docs endpoint.
+You can interact with the API using the Swagger UI documentation. The UI documentation is automatically generated and can be accessed from the `/docs` endpoint.
 
 ### Health check
 
@@ -62,16 +70,30 @@ You can interact with the API using the Swagger UI documentation. The Swagger UI
 }
 ```
 
+### Endpoint: /model-info
+
+```
+  GET /
+```
+
+#### Response
+
+```json
+{
+    "performance": "Mean Absolute Error (MAE) estimated from cross-validation: 56164.80 +/- 9730.04",
+    "model-info": "Pipeline(steps=[('Preprocessing',\n ColumnTransformer(transformers=[('Numeric Feature Transform',\n Pipeline(steps=[('Imputer',\n SimpleImputer(strategy='median')),\n ('Std_Scaler',\n StandardScaler())]),\n ['longitude', 'latitude',\n 'housing_median_age',\n 'total_rooms',\n 'total_bedrooms',\n 'population', 'households',\n 'median_income']),\n ('Categorical Feature '\n 'Transform',\n Pipeline(steps=[('One-hot',\n OneHotEncoder(handle_unknown='ignore'))]),\n ['ocean_proximity'])])),\n ('Regression Model Random Forest',\n RandomForestRegressor(n_estimators=30))])"
+}
+```
+
 ### Endpoint: /predict
 
 ```
   POST /predict
 ```
 
-The POST method expects a JSON object representing the property details for which the price prediction is required. The JSON body should follow the schema described below:
+This POST method expects a JSON object with the property details to predict its price. The JSON body should follow the schema below:
 
 ```json
-{
 {
     "longitude": -122.23,
     "latitude": 37.88,
@@ -83,12 +105,11 @@ The POST method expects a JSON object representing the property details for whic
     "median_income": 8.3252,
     "ocean_proximity": "NEAR BAY"
 }
-}
 ```
 
 #### Response:
 
-If the request is successful, the API will return a JSON object containing the predicted property price:
+A successful request to the API will return a JSON object containing the predicted property price:
 
 ```json
 {
