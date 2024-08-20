@@ -1,6 +1,6 @@
 # Coding Exercise - California Housing Prices Prediction 
 
-This project shows the main process of designing, implementing, and deploying a machine learning model that predicts housing prices. Notice that the focus is more on software architecture and deployment parts than on the machine learning model development part.
+This project shows the main process of designing, implementing, and deploying a machine learning model that predicts housing prices. Notice that the focus is more on the software architecture and deployment parts than on the machine learning model development part.
 
 ## Data Preprocessing
 
@@ -34,7 +34,7 @@ We encapsulated the model in a pipeline. The steps are as follows:
 
 4. Model Evaluation: The performance of the models were evaluated on the testing data using Mean Absolute Error (MAE).
 
-The details of above can be found in `src/preprocessing.py` and `src/preprocessing.py`.
+The details of above can be found in `src/preprocessing.py` and `src/train_model.py`.
 
 ## Model Serving
 
@@ -51,7 +51,7 @@ To run the FastAPI server, follow these steps:
 1. Clone the [housing-prices-app](https://github.com/jamesczq/housing-prices-app) repository
 2. Navigate to the root of the repository
 3. Build the Docker image: `docker build -t house-price-api-image .`
-4. Run the Docker container: `docker run --name api_container -p 8000:8000 house-price-api-image`
+4. Run the Docker container: `docker run --name house-price-api-container -p 8000:8000 house-price-api-image`
 5. The FastAPI server will be accessible at `http://localhost:8000`
 
 ## Testing/API Reference
