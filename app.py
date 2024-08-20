@@ -43,7 +43,7 @@ def predict(property: HouseProperty):
         property = jsonable_encoder(property)
         property = pd.DataFrame([property])
         y_pred = model.predict(property)
-        price = round(float(y_pred[0]), 4)
+        price = int(y_pred[0])
         return {
             "prediction": price,
             "status_code": status.HTTP_200_OK
