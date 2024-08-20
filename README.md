@@ -38,7 +38,9 @@ The details of above can be found in `src/preprocessing.py` and `src/preprocessi
 
 ## Model Serving
 
-We served the prediction/inference with REST API, which can accept input features in JSON format and return the predicted housing price. The details can be found in `app.py`.
+We served the prediction/inference with REST API, which can accept input features in JSON format (*acceptable input features are defined in `src/schema.py`) and return the predicted housing price. 
+
+The details can be found in `app.py`.
 
 ## Deployment
 
