@@ -1,6 +1,8 @@
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+import sklearn
 
 from typing import Tuple
 import pandas as pd
@@ -25,7 +27,7 @@ def clean_df(df: pd.DataFrame, drop_dup=False) -> pd.DataFrame:
     return df
 
 
-def get_x_y(df: pd.DataFrame) -> Tuple[pd.DataFrame.pd.DataFrame]:
+def get_x_y(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Separate features (X), target variables (y), given a dataframe.
 
     Args:

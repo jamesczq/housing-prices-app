@@ -80,7 +80,7 @@ You can interact with the API using the Swagger UI documentation. The UI documen
 
 ```json
 {
-    "performance": "Mean Absolute Error (MAE) estimated from cross-validation: 56164.80 +/- 9730.04",
+    "performance": "Mean Absolute Error (MAE) estimated from cross-validation: 55912.65 +/- 9802.62",
     "model-info": "Pipeline(steps=[('Preprocessing',\n ColumnTransformer(transformers=[('Numeric Feature Transform',\n Pipeline(steps=[('Imputer',\n SimpleImputer(strategy='median')),\n ('Std_Scaler',\n StandardScaler())]),\n ['longitude', 'latitude',\n 'housing_median_age',\n 'total_rooms',\n 'total_bedrooms',\n 'population', 'households',\n 'median_income']),\n ('Categorical Feature '\n 'Transform',\n Pipeline(steps=[('One-hot',\n OneHotEncoder(handle_unknown='ignore'))]),\n ['ocean_proximity'])])),\n ('Regression Model Random Forest',\n RandomForestRegressor(n_estimators=30))])"
 }
 ```
@@ -95,15 +95,14 @@ This POST method expects a JSON object with the property details to predict its 
 
 ```json
 {
-    "longitude": -122.23,
-    "latitude": 37.88,
-    "housing_median_age": 41.0,
-    "total_rooms": 880.0,
-    "total_bedrooms": 129.0,
-    "population": 322.0,
-    "households": 126.0,
-    "median_income": 8.3252,
-    "ocean_proximity": "NEAR BAY"
+    "longitude": -122.64,
+    "latitude": 38.24,
+    "housing_median_age": 40.0,
+    "total_rooms": 1974.0,
+    "total_bedrooms": 410.0,
+    "population": 1039.0,
+    "households": 398.0,
+    "ocean_proximity": "<1H OCEAN"
 }
 ```
 
@@ -113,7 +112,7 @@ A successful request to the API will return a JSON object containing the predict
 
 ```json
 {
-    "prediction": 438413,
+    "prediction": 215256,
     "status_code": 200
 }
 ```
